@@ -1,32 +1,42 @@
+require './room_location'
+require './room_descriptions'
+require './commands'
 
-current_room_x = 5
-current_room_y = 5
-
-while 1 # keep repeating the code in this block forever (or until the keyword break)
-
-  # print out your room information
-  if current_room_x == 5 and current_room_y == 5
-    puts 'You are in a dark room.'
-  elsif current_room_x == 5 and current_room_y == 4
-    puts 'This room is sunny and pleasant.'
-  else
-    puts 'You have entered a room that should not exist.  You DIE.'
-    break
+class Adventure
+  def initialize
+    @room_location = RoomLocation.new 5, 5
+    @room_descriptions = RoomDescriptions.new
+    @commands = Commands.new @room_location
   end
 
-  # get command
-  print '> '
-  command = gets.chomp
+  def print_room_description 
+    if game_over?
+      puts @room_descriptions.death_room
+    else
+      puts @room_descriptions.get_room(@room_location)
+    end
+  end
 
-  # intepret command
-  if command == 'n' or command == 'north'
-    current_room_y = current_room_y - 1
-  elsif command == 's' or command == 'south'
-    current_room_y = current_room_y + 1
-  elsif command == 'w' or command == 'west'
-    current_room_x = current_room_x - 1
-  elsif command == 'e' or command == 'east'
-    current_room_x = current_room_x + 1
+  def game_over?
+    @room_descriptions.get_room(@room_location).length == 0
+  end
+
+  def start
+    while 1
+      puts @room_location.x
+      puts @room_location.y
+
+      print_room_description
+
+      break if game_over?
+      
+      print '> '
+      command = gets.chomp
+
+      @commands.interpret_command command
+    end
   end
 end
 
+adventure = Adventure.new
+adventure.start
